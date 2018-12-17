@@ -9,13 +9,13 @@ In order to prevent sybil attacks, we designed a prize pool distribution algorit
 ## Algorithm
 To disincentivize attackers from doing sybil attacks, our algorithm lessen the total prize according to the number of winners. Let function f(x) returns the total prize for when the number of winners equal to x. For any f(x) that satisfies the condition below, we can guarantee that an attacker will gain less profit if he decides to create a new identity and use it to join the winners group.
 ```
-f(x) < x * f(1) / 2^(x-1)
+f(x) < x * INITIAL_PRIZE_POOL_VALUE / 2^(x-1)
 f(x) > f(x+1)
 ```
 
 Example:
 `
-f(x) = [x * f(1) / 2^(x-1)] -1
+f(x) = [x * INITIAL_PRIZE_POOL_VALUE / 2^(x-1)] -1
 `
 
 
