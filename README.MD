@@ -30,10 +30,14 @@ To disincentivize an attacker from creating a new identity, he should earn less 
 ```
 ∀x ∈ [1, n-1]
 xf(n)/n > (x+1)f(n+1)/(n+1)
+
 =>
+
 ∀x ∈ [1, n-1]
 x(n+1) / ((x+1)n) > f(n+1) / f(n)
+
 =>
+
 ∀x ∈ [1, n-1]
 x(2) / ((x+1)1) > f(2) / f(1)       [1]
 x(3) / ((x+1)2) > f(3) / f(2)       [2]
@@ -43,17 +47,25 @@ x(n) / ((x+1)(n-1)) > f(n) / f(-1)       [n-1]
 
 By multiplying equation [1], [2], [3] ,..., [n-1] together, we can get:
 ( x^(n-1) * n ) / (x+1)^(n-1) > f(n) / f(1)
+
 =>
+
 ∀x ∈ [1, n-1]
 (x/(x+1))^(n-1) * n> f(n) / f(1)
+
 =>
+
 (1/2)^(n-1) * n > f(n) / f(1)       [1]
 (2/3)^(n-1) * n > f(n) / f(1)       [2]
 (3/4)^(n-1) * n > f(n) / f(1)       [3]
 ....
 It is obvious that if equation [1] is true, equation [2],...[n-1] will also be true.
+
 => 
+
 (1/2)^(n-1) * n > f(n) / f(1)       [1]
+
 =>
+
 n * f(1) / 2^(n-1) > f(n)
 ```
