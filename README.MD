@@ -7,11 +7,11 @@ For instance, let's take a simple question game as an example. There is a questi
 In order to prevent sybil attacks, we designed a prize pool distribution algorithm which disincentivize attackers from creating multiple identities. The main concept here is that if an attacker decides to create a new identity, the total profit he'll earn by doing so should be less than before.
 
 ## Algorithm
-To disincentivize attackers from doing sybil attacks, we will lessen the total prize according to the number of winners. Let function f(x) returns the total prize for when the number of winners equal to x. For any f(x) that satisfies the following condition
+To disincentivize attackers from doing sybil attacks, we will lessen the total prize according to the number of winners. Let function f(x) returns the total prize for when the number of winners equal to x. For any f(x) that satisfies the condition below, we can guarantee that an attacker will gain less profit if he decides to create a new identity and use it to join the winners group.
 ```
 x * f(1) / 2^(x-1) > f(x)
 ```
-We can guarantee that an attacker will gain less profit if he decides to create a new identity and use it to join the winners group.
+
 
 ## Proof
 Assume
