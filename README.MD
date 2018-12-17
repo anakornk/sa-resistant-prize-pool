@@ -77,11 +77,11 @@ It is obvious that if equation [1] is true, equation [2],...[n-1] will also be t
 
 => 
 
-(x/(x+1))^(n-1) * PPS(1) > PPS(n)
+(1/2)^(n-1) * PPS(1) > PPS(n)
 
 =>
 
-PPS(n) < PPS(1) * (x/(x+1))^(n-1)
+PPS(n) < PPS(1) * (1/2)^(n-1)
 ```
 
 ## Extra
