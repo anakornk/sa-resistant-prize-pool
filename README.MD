@@ -7,16 +7,22 @@ For instance, let's take a simple question game as an example. There is a questi
 In order to prevent sybil attacks, we designed a prize pool distribution algorithm which disincentivize attackers from creating multiple identities. The main concept here is that if an attacker decides to create a new identity, the total profit he'll earn by doing so should be less than before.
 
 ## Algorithm
-To disincentivize attackers from doing sybil attacks, our algorithm lessen the total prize according to the number of winners. Let function f(x) returns the total prize for when the number of winners equal to x. For any f(x) that satisfies the condition below, we can guarantee that an attacker will gain less profit if he decides to create a new identity and use it to join the winners group.
+To disincentivize attackers from doing sybil attacks, our algorithm lessen the prize per share according to the number of winners. 
+Let 
+1. function f(x) returns the total prize for when the number of winners equal to x. 
+2. function PPS(x) returns the prize per share, which equals to f(x)/x.
+
+For any PPS(x) that satisfies the condition below, we can guarantee that an attacker will gain less profit if he decides to create a new identity and use it to join the winners group.
 ```
-f(x) < x * INITIAL_PRIZE_POOL_VALUE / 2^(x-1)
-f(x) > f(x+1)
+PPS(x) < INITIAL_PRIZE_POOL_VALUE / 2^(x-1)
 ```
 
 Example:
-`
-f(x) = [x * INITIAL_PRIZE_POOL_VALUE / 2^(x-1)] -1
-`
+
+```
+PPS(x) = INITIAL_PRIZE_POOL_VALUE / 2^(x-1) - 1
+f(x) = x*PPS(x) = x(INITIAL_PRIZE_POOL_VALUE / 2^(x-1) - 1)
+```
 
 
 ## Proof
@@ -24,56 +30,58 @@ Assume
 1. Function f(x) returns the total prize amount when N equals x  
 2. Current number of winners equal n
 3. An attacker has x winner identities. x is greater than 0 and less than or equal to n.
+4. PPS(x) equals to f(x)/x.
+
 
 |  |  |  |  |  | | | |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Number of Winners (N)| 1 | 2 | 3 | 4 | ... | n-1 | n | 
 | Total Prize (P) | f(1) | f(2) | f(3) | f(4) | ... | f(n-1) | f(n) |
-| Prize per Share (P/N) | f(1)/1 | f(2)/2 | f(3)/3 | f(4)/4 | ... | f(n-1)/(n-1) | f(n)/n |
+| Prize per Share (PPS=P/N) | f(1)/1 | f(2)/2 | f(3)/3 | f(4)/4 | ... | f(n-1)/(n-1) | f(n)/n |
 
-To disincentivize an attacker from creating a new identity, he should earn less profit if he chose to do so. Hence, f(x) should satisfy the condition below.
+To disincentivize an attacker from creating a new identity, he should earn less profit if he chose to do so. Hence, PPS(x) should satisfy the condition below.
 
 ```
 ∀x ∈ [1, n-1]
-xf(n)/n > (x+1)f(n+1)/(n+1)
+xPPS(n) > (x+1)PPS(n+1)
 
 =>
 
 ∀x ∈ [1, n-1]
-x(n+1) / ((x+1)n) > f(n+1) / f(n)
+x / (x+1) > PPS(n+1) / PPS(n)
 
 =>
 
 ∀x ∈ [1, n-1]
-x(2) / ((x+1)1) > f(2) / f(1)       [1]
-x(3) / ((x+1)2) > f(3) / f(2)       [2]
-x(4) / ((x+1)3) > f(4) / f(3)       [3]
+x / (x+1) > PPS(2) / PPS(1)     [1]
+x / (x+1) > PPS(3) / PPS(2)     [2]
+x / (x+1) > PPS(4) / PPS(3)   [3]
 ...
-x(n) / ((x+1)(n-1)) > f(n) / f(-1)       [n-1]
+x / (x+1) > PPS(n) / PPS(n-1)       [n-1]
 
 By multiplying equation [1], [2], [3] ,..., [n-1] together, we can get:
-( x^(n-1) * n ) / (x+1)^(n-1) > f(n) / f(1)
+(x/(x+1))^(n-1) > PPS(n) / PPS(1)
 
 =>
 
 ∀x ∈ [1, n-1]
-(x/(x+1))^(n-1) * n> f(n) / f(1)
+(x/(x+1))^(n-1) > PPS(n) / PPS(1)
 
 =>
 
-(1/2)^(n-1) * n > f(n) / f(1)       [1]
-(2/3)^(n-1) * n > f(n) / f(1)       [2]
-(3/4)^(n-1) * n > f(n) / f(1)       [3]
+(1/2)^(n-1) > PPS(n) / PPS(1)       [1]
+(2/3)^(n-1) > PPS(n) / PPS(1)       [2]
+(3/4)^(n-1) > PPS(n) / PPS(1)       [3]
 ....
 It is obvious that if equation [1] is true, equation [2],...[n-1] will also be true.
 
 => 
 
-(1/2)^(n-1) * n > f(n) / f(1)       [1]
+(x/(x+1))^(n-1) * PPS(1) > PPS(n)
 
 =>
 
-n * f(1) / 2^(n-1) > f(n)
+PPS(n) < PPS(1) * (x/(x+1))^(n-1)
 ```
 
 ## Extra
