@@ -19,7 +19,6 @@ contract SARPrizePool {
         owner = msg.sender;
     }
 
-    // Transfer Prize to Msg.sender
     function _transferPrize(address payable to, uint amount) internal;
 
     function claimPrize() public isFrozen {
@@ -48,7 +47,7 @@ contract SARPrizePool {
 
     function freeze() public notFrozen {
         require(_canFreeze(), "No permmission to freeze");
-        // order is important here
+        // DO NOT CHANGE THE ORDER BELOW
         frozenPrizePerShare = getCurrentPrizePerShare();
         frozen = true;
     }
