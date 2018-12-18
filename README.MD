@@ -7,21 +7,25 @@ For instance, let's take a simple question game as an example. There is a questi
 In order to prevent sybil attacks, we designed a prize pool distribution algorithm which disincentivize attackers from creating multiple identities. The main concept here is that if an attacker decides to create a new identity, the total profit he'll earn by doing so should be less than before.
 
 ## Algorithm
-To disincentivize attackers from doing sybil attacks, our algorithm lessen the prize per share according to the number of winners. 
+To disincentivize attackers from doing sybil attacks, our algorithm lessen the total prize according to the number of winners. 
 Let 
 1. function f(x) returns the total prize for when the number of winners equal to x. 
 2. function PPS(x) returns the prize per share, which equals to f(x)/x.
 
 For any PPS(x) that satisfies the condition below, we can guarantee that an attacker will gain less profit if he decides to create a new identity and use it to join the winners group.
 ```
-PPS(x) < INITIAL_PRIZE_POOL_VALUE / 2^(x-1)
+PPS(x) > 2*PPS(x+1)
+```
+We can compute f(x) as below
+```
+f(x) = x*PPS(x)
 ```
 
 Example:
 
 ```
-PPS(x) = INITIAL_PRIZE_POOL_VALUE / 2^(x-1) - 1
-f(x) = x*PPS(x) = x(INITIAL_PRIZE_POOL_VALUE / 2^(x-1) - 1)
+PPS(x) = [INITIAL_PRIZE_POOL_VALUE / 2^(x-1)] - 1
+f(x) = x*PPS(x) = x([INITIAL_PRIZE_POOL_VALUE / 2^(x-1)] - 1)
 ```
 
 
@@ -52,53 +56,30 @@ x / (x+1) > PPS(n+1) / PPS(n)
 
 =>
 
-∀x ∈ [1, n-1]
-x / (x+1) > PPS(2) / PPS(1)     [1]
-x / (x+1) > PPS(3) / PPS(2)     [2]
-x / (x+1) > PPS(4) / PPS(3)   [3]
-...
-x / (x+1) > PPS(n) / PPS(n-1)       [n-1]
-
-By multiplying equation [1], [2], [3] ,..., [n-1] together, we can get:
-(x/(x+1))^(n-1) > PPS(n) / PPS(1)
-
-=>
-
-∀x ∈ [1, n-1]
-(x/(x+1))^(n-1) > PPS(n) / PPS(1)
-
-=>
-
-(1/2)^(n-1) > PPS(n) / PPS(1)       [1]
-(2/3)^(n-1) > PPS(n) / PPS(1)       [2]
-(3/4)^(n-1) > PPS(n) / PPS(1)       [3]
+1 / 2 > PPS(n+1) / PPS(n)           [1]
+2 / 3 > PPS(n+1) / PPS(n)           [2]
+3 / 4 > PPS(n+1) / PPS(n)           [3]
 ....
 It is obvious that if equation [1] is true, equation [2],...[n-1] will also be true.
 
 => 
 
-(1/2)^(n-1) * PPS(1) > PPS(n)
+1 / 2 > PPS(n+1) / PPS(n)           [1]
 
 =>
 
-PPS(n) < PPS(1) * (1/2)^(n-1)
+PPS(n) > 2*PPS(n+1)
 ```
 
 ## Extra
 The above algorithm can be tweaked and applied to situations where the prize pool is not evenly distributed to each winner. (e.g. early winners earn more than late winners)
 
-Assume
-1. Function f(x) returns the total prize for when the number of winners equal to x and satisfies the condition below.
-```
-f(x) < x * f(1) / 2^(x-1)
-```
-
 Let function p(X, Y) returns the prize value for the Yth place winner when there are X winners altogether. If Y > X, function p returns 0. If the conditions below are met, an attacker should not have the incentive to do a sybil attack.
-```
-∀y ∈ [1, n]
-p(n, y) <= f(n)/n
 
+Assume there are currrently n winners.
+```
+∀y ∈ [1, n],
 p(n, y) > 2*p(n+1, y)
-p(n, y) > p(n, y+1)
-```
 
+p(n+1, n) >= p(n+1, n+1)
+```
