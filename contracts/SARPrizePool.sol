@@ -88,39 +88,3 @@ contract SARPrizePool {
         _;
     }
 }
-
-
-contract ETHPrizePool is SARPrizePool {
-
-    constructor(uint _C) public SARPrizePool(_C) {
-    }
-
-    function () external payable {}   
-
-    function getInitialPrizePool() public view returns (uint) {
-        return address(this).balance;
-    }
-
-    // Transfer prize to msg.sender
-    function _transferPrize() internal {
-        msg.sender.transfer(getFrozenPrizePerShare());
-    }
-}
-
-contract SimpleSumGame is ETHPrizePool {
-    uint public sum;
-
-    constructor(uint _sum) public ETHPrizePool(1) {
-        sum = _sum;
-    }
-
-    function submitAnswer(uint _a, uint _b) public isNotWinner {
-        if (_a + _b == sum) {
-            addWinner(msg.sender);
-        } 
-    }
-
-    function canFreeze() internal view returns (bool) {
-        return msg.sender == getOwner();
-    }
-}
