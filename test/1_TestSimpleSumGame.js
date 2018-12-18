@@ -1,12 +1,11 @@
 var SimpleSumGame = artifacts.require("./SimpleSumGame.sol");
 
 contract('Test SimpleSumGame', function(accounts) {
-
   it("should check initial prize pool value correctly", async function() {
     let simpleSumGame = await SimpleSumGame.deployed();
     await web3.eth.sendTransaction({to: simpleSumGame.address, from: accounts[0], value: web3.utils.toWei("0.5", "ether")})
-    let initialPrizePool = await simpleSumGame.getInitialPrizePool.call({from: accounts[0]});
-    assert(initialPrizePool.toString(16), '500000000000000000');
+    let initialPrizePool = await simpleSumGame.getPrizePool.call({from: accounts[0]});
+    assert.equal(initialPrizePool.toString(10), '500000000000000000');
   });
 
   it("should update winners correctly", async function() {
@@ -15,7 +14,7 @@ contract('Test SimpleSumGame', function(accounts) {
     await simpleSumGame.submitAnswer(1, 4, {from: accounts[2]});
     await simpleSumGame.submitAnswer(1, 5, {from: accounts[3]});
     let winnersCount = await simpleSumGame.getWinnersCount.call({from: accounts[0]});
-    assert(winnersCount, 2);
+    assert.equal(winnersCount, 2);
   });
 
   it("should not be able to submit answer twice", async function() {
@@ -41,7 +40,7 @@ contract('Test SimpleSumGame', function(accounts) {
   it("should compute prize per share correctly", async function() {
     let simpleSumGame = await SimpleSumGame.deployed();
     let currentPrizePerShare =  await simpleSumGame.getCurrentPrizePerShare.call({from: accounts[1]});
-    assert(currentPrizePerShare, '249999999999999999');
+    assert.equal(currentPrizePerShare, '249999999999999999');
   });
 
   it("should not be able to submit new answer once frozen", async function() {
@@ -57,10 +56,14 @@ contract('Test SimpleSumGame', function(accounts) {
 
   it("should be able to claim prize correctly", async function() {
     let simpleSumGame = await SimpleSumGame.deployed();
+    let initialPrizePool = await simpleSumGame.getPrizePool.call({from: accounts[1]});
+    let currentPrizePerShare =  await simpleSumGame.getCurrentPrizePerShare.call({from: accounts[1]});
     await simpleSumGame.claimPrize({from: accounts[1]});
-    let initialPrizePool = await simpleSumGame.getInitialPrizePool.call({from: accounts[1]});
-    console.log(initialPrizePool.toString(10));
-    // TODO: 
+    let leftPrizePool = await simpleSumGame.getPrizePool.call({from: accounts[1]});
+    assert(initialPrizePool.sub(leftPrizePool).eq(currentPrizePerShare));
+    await simpleSumGame.claimPrize({from: accounts[2]});
+    leftPrizePool = await simpleSumGame.getPrizePool.call({from: accounts[1]});
+    assert.equal(leftPrizePool.toString(10),'2');
   });
 
   it("should not be able to claim prize twice", async function() {

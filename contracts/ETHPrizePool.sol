@@ -9,12 +9,12 @@ contract ETHPrizePool is SARPrizePool {
 
     function () external payable {}   
 
-    function getInitialPrizePool() public view returns (uint) {
+    function getPrizePool() public view returns (uint) {
         return address(this).balance;
     }
 
     // Transfer prize to msg.sender
     function _transferPrize() internal {
-        msg.sender.transfer(getFrozenPrizePerShare());
+        msg.sender.transfer(getCurrentPrizePerShare());
     }
 }

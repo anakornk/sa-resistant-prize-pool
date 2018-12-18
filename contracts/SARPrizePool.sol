@@ -30,10 +30,14 @@ contract SARPrizePool {
         emit ClaimPrize(msg.sender, frozenPrizePerShare);
     }
 
-    function getInitialPrizePool() public view returns (uint);
+    function getPrizePool() public view returns (uint);
 
     function getCurrentPrizePerShare() public view returns (uint) {
-        return (getInitialPrizePool() / 2 ** (winnersCount-1)) - C;
+        if(frozen) {
+            return frozenPrizePerShare;
+        } else {
+            return (getPrizePool() / 2 ** (winnersCount-1)) - C;
+        }
     }
 
     function getCurrentPrizePool() public view returns (uint) {
@@ -44,8 +48,9 @@ contract SARPrizePool {
 
     function freeze() public notFrozen {
         require(_canFreeze(), "No permmission to freeze");
-        frozen = true;
+        // order is important here
         frozenPrizePerShare = getCurrentPrizePerShare();
+        frozen = true;
     }
 
     modifier isFrozen() {
@@ -64,14 +69,6 @@ contract SARPrizePool {
         winnersCount = temp;
         winnerMap[winner] = true;
         emit NewWinner(winner);
-    }
-
-    function getFrozenPrizePerShare() public view isFrozen returns (uint) {
-        return frozenPrizePerShare;
-    }
-
-    function getFrozenPrizePool() public view isFrozen returns (uint) {
-        return winnersCount * frozenPrizePerShare;
     }
 
     function getOwner() public view returns (address) {
