@@ -85,6 +85,10 @@ contract SARPrizePool {
         _;
     }
 
+    function checkWinner(address winner) public view returns (bool) {
+        return winnerMap[winner];
+    }
+
     function getWinnersCount() public view returns (uint) {
         return winnersCount;
     }
