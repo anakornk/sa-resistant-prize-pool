@@ -21,14 +21,6 @@ We can compute f(x) as below
 f(x) = x*PPS(x)
 ```
 
-Example:
-
-```
-PPS(x) = [INITIAL_PRIZE_POOL_VALUE / 2^(x-1)] - 1
-f(x) = x*PPS(x) = x([INITIAL_PRIZE_POOL_VALUE / 2^(x-1)] - 1)
-```
-
-
 ## Proof
 Assume
 1. Function f(x) returns the total prize amount when N equals x  
@@ -46,12 +38,12 @@ Assume
 To disincentivize an attacker from creating a new identity, he should earn less profit if he chose to do so. Hence, PPS(x) should satisfy the condition below.
 
 ```
-∀x ∈ [1, n-1]
+∀x ∈ [1, n]
 xPPS(n) > (x+1)PPS(n+1)
 
 =>
 
-∀x ∈ [1, n-1]
+∀x ∈ [1, n]
 x / (x+1) > PPS(n+1) / PPS(n)
 
 =>
@@ -60,7 +52,7 @@ x / (x+1) > PPS(n+1) / PPS(n)
 2 / 3 > PPS(n+1) / PPS(n)           [2]
 3 / 4 > PPS(n+1) / PPS(n)           [3]
 ....
-It is obvious that if equation [1] is true, equation [2],...[n-1] will also be true.
+It is obvious that if equation [1] is true, equation [2],...[n] will also be true.
 
 => 
 
@@ -70,6 +62,64 @@ It is obvious that if equation [1] is true, equation [2],...[n-1] will also be t
 
 PPS(n) > 2*PPS(n+1)
 ```
+
+## Example
+Let's find a valid PPS function. First we solve PPS(x) = 2*PPS(x+1)
+```
+1 / 2 =  PPS(2) / PPS(1)        [1]
+1 / 2 =  PPS(3) / PPS(2)        [2]
+1 / 2 =  PPS(4) / PPS(3)        [3]
+...
+1 / 2 =  PPS(x) / PPS(x-1)      [x-1]
+
+By multiplying equation [1], [2], [3] ,..., [x-1] together, we can get:
+(1/2)^(x-1) = PPS(x) / PPS(1)
+
+==>
+
+PPS(x) = PPS(1) / 2^(x-1)
+```
+
+Minus the above PPS by a positive constant C to make sure that `PPS(x) > 2*PPS(x+1)` is always true.
+Hence, we get 
+```
+PPS(x) = [PPS(1) / 2^(x-1)] - C
+```
+
+To make sure that `PPS(x) > 2*PPS(x+1)` always return true. Let's put the new PPS into the recursive function.
+```
+PPS(x) > 2*PPS(x+1)
+
+===>
+
+[PPS(1) / 2^(x-1)] - C > (2 *PPS(1) / 2^(x)) - 2C
+
+===>
+
+2*PPS(1) - 2^(x)*C > 2*PPS(1) - 2^(x+1)*C
+
+===>
+
+2^(x)*C > 0
+
+===>
+
+true
+```
+
+Summary:  
+
+We have now proved that 
+```
+PPS(x) = [PPS(1) / 2^(x-1)] - C
+```
+satisfies the requirement to be sybil resistant.
+
+We can compute f(x) as follows
+```
+f(x) = x*PPS(x) = x([PPS(1) / 2^(x-1)] - C)
+```
+
 
 ## Extra
 The above algorithm can be tweaked and applied to situations where the prize pool is not evenly distributed to each winner. (e.g. early winners earn more than late winners)
