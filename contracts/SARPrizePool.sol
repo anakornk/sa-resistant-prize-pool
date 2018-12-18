@@ -2,7 +2,7 @@ pragma solidity >=0.4.21 <0.6.0;
 
 contract SARPrizePool {
 
-    address private owner;
+    address payable private owner;
     uint private winnersCount;
     uint private frozenPrizePerShare;
     bool private frozen;
@@ -20,13 +20,13 @@ contract SARPrizePool {
     }
 
     // Transfer Prize to Msg.sender
-    function _transferPrize() internal;
+    function _transferPrize(address payable to, uint amount) internal;
 
     function claimPrize() public isFrozen {
         require(winnerMap[msg.sender], "You're not a winner");
         require(hasClaimed[msg.sender] == false, "You have claimed the prize already");
         hasClaimed[msg.sender] = true;
-        _transferPrize();
+        _transferPrize(msg.sender, getCurrentPrizePerShare());
         emit ClaimPrize(msg.sender, frozenPrizePerShare);
     }
 
@@ -85,11 +85,26 @@ contract SARPrizePool {
         _;
     }
 
+    modifier isOwner {
+        require(msg.sender == owner, "You're not the owner");
+        _;
+    }
+
     function checkWinner(address winner) public view returns (bool) {
         return winnerMap[winner];
     }
 
+    function checkFrozen() public view returns (bool) {
+        return frozen;
+    }
+
     function getWinnersCount() public view returns (uint) {
         return winnersCount;
+    }
+
+    function refundLeftovers() public returns (uint leftovers) {
+        // TODO: COMPUTE LEFTOVERS
+        leftovers = 5;
+        _transferPrize(owner, leftovers);
     }
 }

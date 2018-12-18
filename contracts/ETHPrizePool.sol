@@ -14,7 +14,7 @@ contract ETHPrizePool is SARPrizePool {
     }
 
     // Transfer prize to msg.sender
-    function _transferPrize() internal {
-        msg.sender.transfer(getCurrentPrizePerShare());
+    function _transferPrize(address payable to, uint amount) internal {
+        to.transfer(amount);
     }
 }
