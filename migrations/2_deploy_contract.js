@@ -1,5 +1,6 @@
 var SimpleSumGame = artifacts.require("./SimpleSumGame.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(SimpleSumGame);
+  let sum = 5;
+  deployer.deploy(SimpleSumGame, sum);
 };

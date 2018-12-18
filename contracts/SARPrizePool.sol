@@ -40,10 +40,10 @@ contract SARPrizePool {
         return winnersCount * getCurrentPrizePerShare();
     }
 
-    function canFreeze() internal view returns (bool);
+    function _canFreeze() internal view returns (bool);
 
     function freeze() public notFrozen {
-        require(canFreeze(), "No permmission to freeze");
+        require(_canFreeze(), "No permmission to freeze");
         frozen = true;
         frozenPrizePerShare = getCurrentPrizePerShare();
     }
@@ -86,5 +86,9 @@ contract SARPrizePool {
     modifier isNotWinner {
         require(!winnerMap[msg.sender], "You're already a winner!");
         _;
+    }
+
+    function getWinnersCount() public view returns (uint) {
+        return winnersCount;
     }
 }

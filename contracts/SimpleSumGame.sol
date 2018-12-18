@@ -15,7 +15,7 @@ contract SimpleSumGame is ETHPrizePool {
         } 
     }
 
-    function canFreeze() internal view returns (bool) {
+    function _canFreeze() internal view returns (bool) {
         return msg.sender == getOwner();
     }
 }
