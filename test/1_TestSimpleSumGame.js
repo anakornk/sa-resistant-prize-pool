@@ -89,6 +89,5 @@ contract('Test SimpleSumGame', function(accounts) {
     await simpleSumGame.refundLeftovers({from: accounts[0]});
     let finalPrizePool = await simpleSumGame.getPrizePool.call({from: accounts[0]});
     assert.equal(finalPrizePool.toString(10), '0');
-    // TODO:
   });
 });
