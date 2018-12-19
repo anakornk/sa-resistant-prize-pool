@@ -1,11 +1,14 @@
 pragma solidity >=0.4.21 <0.6.0;
+import "./SafeMath.sol";
 
 contract SARPrizePool {
+    using SafeMath for uint;
 
     address payable private owner;
     uint private winnersCount;
     uint private frozenPrizePerShare;
     bool private frozen;
+    uint private claimsCount;
 
     uint private C;
     mapping ( address => bool ) private hasClaimed;
@@ -25,6 +28,7 @@ contract SARPrizePool {
         require(winnerMap[msg.sender], "You're not a winner");
         require(hasClaimed[msg.sender] == false, "You have claimed the prize already");
         hasClaimed[msg.sender] = true;
+        claimsCount = claimsCount.add(1);
         _transferPrize(msg.sender, getCurrentPrizePerShare());
         emit ClaimPrize(msg.sender, frozenPrizePerShare);
     }
@@ -63,9 +67,7 @@ contract SARPrizePool {
     }
 
     function addWinner(address winner) internal notFrozen {
-        uint temp = winnersCount + 1;
-        require(temp >= winnersCount, "Overflow");
-        winnersCount = temp;
+        winnersCount = winnersCount.add(1);
         winnerMap[winner] = true;
         emit NewWinner(winner);
     }
@@ -101,9 +103,18 @@ contract SARPrizePool {
         return winnersCount;
     }
 
-    function refundLeftovers() public returns (uint leftovers) {
-        // TODO: COMPUTE LEFTOVERS
-        leftovers = 5;
+    function getClaimsCount() public view returns (uint) {
+        return claimsCount;
+    }
+
+    function getLeftovers() public view returns (uint leftovers) {
+        uint claimablePrize = (winnersCount - claimsCount) * frozenPrizePerShare;
+        leftovers = getPrizePool().sub(claimablePrize);
+        assert(leftovers >= 0);
+    }
+
+    function refundLeftovers() public isOwner returns (uint leftovers) {
+        leftovers = getLeftovers();
         _transferPrize(owner, leftovers);
     }
 }

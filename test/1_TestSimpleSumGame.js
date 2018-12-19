@@ -78,6 +78,17 @@ contract('Test SimpleSumGame', function(accounts) {
 
   it("owner should be able to claim leftovers", async function() {
     let simpleSumGame = await SimpleSumGame.deployed();
+    let leftovers = await simpleSumGame.getLeftovers.call({from: accounts[1]});
+    assert.equal(leftovers.toString(10),'2');
+    try {
+      await simpleSumGame.refundLeftovers({from: accounts[1]});
+      assert.fail();
+    } catch (err) {
+      assert.ok(/revert/.test(err.message));
+    }   
+    await simpleSumGame.refundLeftovers({from: accounts[0]});
+    let finalPrizePool = await simpleSumGame.getPrizePool.call({from: accounts[0]});
+    assert.equal(finalPrizePool.toString(10), '0');
     // TODO:
   });
 });
